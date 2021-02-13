@@ -4,7 +4,8 @@
   "description": "The kahoot winner launcher",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron app.js"
   },
   "repository": {
     "type": "git",
@@ -17,6 +18,7 @@
   },
   "homepage": "https://github.com/theusaf/kahoot-win-launcher#readme",
   "dependencies": {
+    "dmg": "^0.1.0",
     "electron": "^11.2.3",
     "electron-builder": "^22.9.1"
   },
@@ -42,7 +44,8 @@
     },
     "files": [
       "assets",
-      "app.js"
+      "app.js",
+      "package.json"
     ],
     "appImage": {
       "category": "Game",

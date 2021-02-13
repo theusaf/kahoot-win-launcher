@@ -1,0 +1,94 @@
+main{
+  display: flex;
+  flex: 1;
+  position: relative;
+}
+footer{
+  background: #222;
+  color: #EEE;
+  padding: 1rem;
+}
+html{
+  height: 100%;
+}
+header{
+  display: flex;
+  padding: 0.25rem;
+  position: relative;
+}
+body{
+  font-family: 'Montserrat', Helvetica, sans-serif;
+  margin: 0;
+  height: 100%;
+  display: flex;
+  flex-flow: column;
+  background: #AA2277;
+}
+h1{
+  padding: 0.25rem;
+  margin: 0.5rem;
+  background: #FFDD33;
+  border-radius: 0.5rem;
+  display: inline-block;
+  box-shadow: 0.25rem 0.25rem rgba(0,0,0,0.5);
+}
+#header-icon{
+  height: 4rem;
+}
+#output{
+  background: #444;
+  padding: 1rem;
+  width: 100%;
+  word-break: break-all;
+  color: #DDD;
+}
+#tabs{
+  display: flex;
+  flex-flow: column;
+  flex: 0;
+  min-width: 12rem;
+  background: rgb(30,0,100);
+  color: #EEE;
+}
+#tabs>div{
+  padding: 1rem;
+  border-bottom: solid #444 0.1rem;
+}
+#tabs>div:hover,
+.tab-active{
+  background: rgba(255,255,255,0.7);
+  color: black;
+}
+#output{
+  flex: 1;
+}
+#launch-button{
+  position: absolute;
+  top: .25rem;
+  right: 1rem;
+  height: calc(100% - .5rem);
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+#launch-button>span{
+  flex: 1;
+  display: block;
+  font-weight: 600;
+  background: rgb(102,191,57);
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  box-shadow: 0.25rem 0.25rem rgba(0,0,0,0.5);
+}
+#launch-button:hover>span{
+  box-shadow: unset;
+  transform: translate(.25rem, .25rem);
+  background: white;
+}
+#errors{
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  pointer-events: none;
+}
