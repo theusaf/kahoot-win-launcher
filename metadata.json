@@ -1,0 +1,9 @@
+{
+  "version": "6.0.0",
+  "releases": {
+    "windows": null,
+    "mac": null,
+    "linux": null
+  },
+  "database_format": 6
+}

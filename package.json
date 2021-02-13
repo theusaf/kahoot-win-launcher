@@ -1,0 +1,52 @@
+{
+  "name": "kahoot-win-launcher",
+  "version": "1.0.0",
+  "description": "The kahoot winner launcher",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/theusaf/kahoot-win-launcher.git"
+  },
+  "author": "theusaf",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/theusaf/kahoot-win-launcher/issues"
+  },
+  "homepage": "https://github.com/theusaf/kahoot-win-launcher#readme",
+  "dependencies": {
+    "electron": "^11.2.3",
+    "electron-builder": "^22.9.1"
+  },
+  "build": {
+    "appId": "io.github.theusaf.kahoot-win-launcher",
+    "productName": "Kahoot Winner Launcher",
+    "copyright": "Copyright 2021 theusaf",
+    "mac": {
+      "icon": "icon.icns",
+      "target": "dmg"
+    },
+    "dmg": {
+      "icon": "install.icns",
+      "title": "Kahoot Winner Install"
+    },
+    "win": {
+      "icon": "icon.ico",
+      "target": "portable"
+    },
+    "linux": {
+      "icon": "icon.png",
+      "target": "AppImage"
+    },
+    "files": [
+      "assets",
+      "app.js"
+    ],
+    "appImage": {
+      "category": "Game",
+      "license": "LICENSE"
+    }
+  }
+}
