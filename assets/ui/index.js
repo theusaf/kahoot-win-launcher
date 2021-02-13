@@ -1,10 +1,33 @@
 const {ipcRenderer} = require("electron"),
   output = document.querySelector("#output"),
   tabsContainer = document.querySelector("#tabs"),
-  errorContainer = document.querySelector("#errors");
+  errorContainer = document.querySelector("#errors"),
+  launchButton = document.querySelector("#launch-button");
 
 function createErrorNotice(error, options){
-
+  const div = document.createElement("div");
+  div.innerHTML = `
+    <span class="error-closer">x</span>
+    <span class="error-content">${error}</span>
+  `;
+  div.className = `error ${options.notice ? "notice" : ""}`;
+  const closer = div.querySelector(".error-closer");
+  errorContainer.append(div);
+  closer.addEventListener("click", () => {
+    div.remove();
+  });
+  if (options.onclick) {
+    div.addEventListener("click", options.onclick);
+  }
+  if (options.permanent) {
+    return;
+  }
+  setTimeout(() => {
+    div.style.opacity = 0;
+    setTimeout(() => {
+      div.remove();
+    }, 500);
+  }, (options.time || 7e3) - 500);
 }
 
 async function loadView(view){
@@ -16,7 +39,7 @@ async function loadView(view){
   }
   newActive.className = "tab-active";
   output.innerHTML = html;
-  const scripts = output.querySelector("script");
+  const scripts = output.querySelectorAll("script");
   for (let i = 0; i < scripts.length; i++) {
     eval(scripts[i].textContent);
   }
@@ -42,3 +65,4 @@ tabsContainer.addEventListener("click", (event) => {
     loadView(target.id.match(/(?<=-).*/)[0]);
   }
 });
+launchButton.addEventListener("click", launchApp);

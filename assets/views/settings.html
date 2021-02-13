@@ -1,0 +1,97 @@
+<style>
+  #output-settings{
+    background: #111;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+  }
+  #output-settings>div{
+    background: rgba(255,255,255,0.3);
+    border-radius: 0.5rem;
+    padding: 0.25rem;
+  }
+  #output-settings>div:not(:last-child){
+    margin-bottom: 0.5rem;
+  }
+  #output-settings>div>label:first-child{
+    font-weight: 600;
+    font-size: 1.25rem;
+    min-width: 20rem;
+    max-width: 20rem;
+    display: inline-block;
+  }
+  .toggle>input{
+    display: none;
+  }
+  .toggle>input+label{
+    background: white;
+    display: inline-block;
+    width: 6rem;
+    border-radius: 0.5rem;
+    text-align: center;
+    color: black;
+    position: relative;
+  }
+  .toggle>input+label::before{
+    content: "";
+    background: skyblue;
+    border-radius: 0.5rem;
+    position: absolute;
+    width: 50%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    transition: left 0.5s;
+  }
+  .toggle>input:checked+label::before{
+    left: 50%;
+  }
+  .input>input{
+    border-radius: 0.15rem;
+    background: white;
+    border: 0;
+  }
+</style>
+<h2>Settings</h2>
+<div id="output-settings">
+  <div id="output-settings-keepLauncherOpen" class="toggle">
+    <label>Keep Launcher Open</label>
+    <input id="output-settings-keepLauncherOpen-input" type="checkbox">
+    <label for="output-settings-keepLauncherOpen-input">ON &nbsp; OFF</label>
+    <p>Keep the launcher open after opening an application.</p>
+  </div>
+  <div id="output-settings-PORT" class="input">
+    <label>Kahoot Winner Server PORT</label>
+    <input id="output-settings-PORT-input" type="number">
+    <p>This sets the port for the Kahoot Winner server</p>
+  </div>
+</div>
+<script>
+  (()=>{
+    const inputs = document.querySelectorAll("#output input");
+    function getSettings(){
+      ipcRenderer.invoke("getMetadata").then((data) => {
+        for (const i in data.settings) {
+          const input = document.querySelector(`#output-settings-${i}-input`);
+          if (input.type === "checkbox") {
+            input.checked = !!data.settings[i];
+          } else {
+            input.value = data.settings[i];
+          }
+        }
+      });
+    }
+    function saveSettings(){
+      const settings = {};
+      for (let i = 0; i < inputs.length; i++) {
+        settings[inputs[i].id.match(/(?<=^output-settings-).*?(?=-input$)/)[0]] = inputs[i].type === "checkbox" ? inputs[i].checked : inputs[i].value;
+      }
+      ipcRenderer.invoke("updateSettings", settings);
+    }
+    for (let i = 0; i < inputs.length; i++) {
+      inputs[i].addEventListener("change", () => {
+        saveSettings();
+      });
+    }
+    getSettings();
+  })();
+</script>

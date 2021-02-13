@@ -1,7 +1,16 @@
+@keyframes enter {
+  from{
+    transform: translateX(100%);
+  }
+  to{
+    transform: translateX(0);
+  }
+}
 main{
   display: flex;
   flex: 1;
   position: relative;
+  overflow-x: hidden;
 }
 footer{
   background: #222;
@@ -41,6 +50,7 @@ h1{
   width: 100%;
   word-break: break-all;
   color: #DDD;
+  overflow-y: auto;
 }
 #tabs{
   display: flex;
@@ -49,6 +59,7 @@ h1{
   min-width: 12rem;
   background: rgb(30,0,100);
   color: #EEE;
+  overflow-y: auto;
 }
 #tabs>div{
   padding: 1rem;
@@ -89,6 +100,31 @@ h1{
 #errors{
   position: absolute;
   top: 0.5rem;
-  left: 0.5rem;
+  right: 0.5rem;
+  width: 24rem;
   pointer-events: none;
+}
+.error{
+  pointer-events: all;
+  display: flex;
+  align-items: center;
+  background: rgba(255,50,50,0.8);
+  padding: 0.25rem;
+  opacity: 1;
+  margin-bottom: 0.5rem;
+  border-radius: 0.5rem;
+  animation-fill-mode: forwards;
+  animation: enter 0.5s;
+  transition: opacity 0.5s;
+}
+.error-closer{
+  cursor: pointer;
+  font-size: 2rem;
+}
+.error.notice{
+  background: rgba(0,0,0,0.8);
+}
+.error-content{
+  text-align: center;
+  flex: 1;
 }

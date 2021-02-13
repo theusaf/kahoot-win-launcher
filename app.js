@@ -1,7 +1,6 @@
 const electron = require("electron"),
   path = require("path"),
   fs = require("fs"),
-  open = require("open"),
   dmg = require("dmg"),
   {app, BrowserWindow, ipcMain, shell} = electron,
   MAIN_PATH = path.join((electron.app || electron.remote.app).getPath("appData"),"Kahoot Winner"),
@@ -9,6 +8,7 @@ const electron = require("electron"),
     databaseDownloaded: false,
     applicationDownloaded: false,
     currentApplicationVersion: null,
+    lastApplicationUpdateCheck: null,
     lastDatabaseUpdateTime: null,
     settings: {
       keepLauncherOpen: false,
@@ -75,13 +75,26 @@ ipcMain.handle("getView", (event, view) => {
   });
 });
 
+ipcMain.handle("getMetadata", () => {
+  return config;
+});
+
 ipcMain.handle("launchApp", () => {
-  if (config.applicationDownloaded) {
-    shell.openPath(path.join(MAIN_PATH, `Kahoot Winner.${getExecutableExtension()}`));
-    return true;
-  } else {
-    return false;
-  }
+  return new Promise((resolve) => {
+    fs.writeFile(path.join(MAIN_PATH, ".env"), `PORT=${config.settings.PORT || 2000}`, () => {
+      if (config.applicationDownloaded) {
+        shell.openPath(path.join(MAIN_PATH, `Kahoot Winner.${getExecutableExtension()}`));
+        resolve(true);
+      } else {
+        resolve(false);
+      }
+    });
+  });
+});
+
+ipcMain.handle("updateSettings", (event, settings) => {
+  Object.assign(config.settings, settings);
+  updateMetadata();
 });
 
 ipcMain.handle("closeWindow", () => {

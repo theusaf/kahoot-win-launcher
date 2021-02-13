@@ -5,11 +5,17 @@
     "mac": null,
     "linux": null
   },
-  "database_format": 6,
+  "database_format": 0,
   "launcher_version": "1.0.0",
   "launcher_releases": {
     "windows": null,
     "mac": null,
     "linux": null
-  }
+  },
+  "database_formats": [
+    {
+      "keys": "https://archive.org/download/kahoot-win/full-export-keys-sectioned-2.json",
+      "files": "https://archive.org/download/kahoot-win/json-full.zip"
+    }
+  ]
 }

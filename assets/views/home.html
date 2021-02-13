@@ -1,0 +1,70 @@
+<style>
+  #output img{
+    height: 6rem;
+  }
+  #output-launchDiv{
+    display: flex;
+    align-items: center;
+    position: relative;
+    flex: 1;
+  }
+  #output-appHeader{
+    display: flex;
+    background: #666;
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+  }
+  #output-appLaunchButton{
+    position: absolute;
+    right: 0.5rem;
+  }
+  #output-appLaunchButton>span{
+    flex: 1;
+    display: block;
+    font-weight: 600;
+    background: rgb(102,191,57);
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+    box-shadow: 0.25rem 0.25rem rgba(0,0,0,0.5);
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: black;
+  }
+  #output-appLaunchButton:hover>span{
+    box-shadow: unset;
+    transform: translate(.25rem, .25rem);
+    background: white;
+  }
+</style>
+<h2>Applications</h2>
+<div id="output-appHeader">
+  <div>
+    <img src="resource/icon.png" alt="logo">
+  </div>
+  <div>
+    <strong>Kahoot Winner</strong>
+    <p>Version <span id="output-appVersion">???</span></p>
+    <p>Last update check: <span id="output-appUpdate">???</span></p>
+  </div>
+  <div id="output-launchDiv">
+    <div id="output-appLaunchButton"><span>Launch App</span></div>
+  </div>
+</div>
+<h2>Welcome</h2>
+<p>To modify settings, click the "Settings" tab.</p>
+<p>To view or download the database, click the "Database" tab.</p>
+<p>To install or update the app, click the "Check for Updates" tab</p>
+<script>
+  (() => {
+    const launch = document.querySelector("#output-appLaunchButton"),
+      version = document.querySelector("#output-appVersion"),
+      updateCheck = document.querySelector("#output-appUpdate");
+    launch.addEventListener("click", () => {
+      launchApp();
+    });
+    ipcRenderer.invoke("getMetadata").then((data) => {
+      version.textContent = data.currentApplicationVersion || "(Not installed)";
+      updateCheck.textContent = data.lastApplicationUpdateCheck ? new Date(data.lastApplicationUpdateCheck) : "Never";
+    });
+  })();
+</script>
