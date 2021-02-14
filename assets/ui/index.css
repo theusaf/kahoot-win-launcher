@@ -122,7 +122,8 @@ h1{
   font-size: 2rem;
 }
 .error.notice{
-  background: rgba(0,0,0,0.8);
+  background: rgba(0,0,0,0.3);
+  color: white;
 }
 .error-content{
   text-align: center;

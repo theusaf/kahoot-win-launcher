@@ -21,6 +21,8 @@
     "dmg": "^0.1.0",
     "electron": "^11.2.3",
     "electron-builder": "^22.9.1",
+    "fs-extra": "^8.1.0",
+    "got": "^11.8.1",
     "yauzl": "^2.10.0"
   },
   "build": {

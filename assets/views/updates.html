@@ -56,9 +56,9 @@
       versionLabel = document.querySelector("#output-appVersion"),
       updateLabel = document.querySelector("#output-appUpdate"),
       config = await ipcRenderer.invoke("getMetadata");
-    if (config.currentApplicationVersion === null) {
+    if (config.applicationDownloaded === false) {
       versionLabel.textContent = "(Not installed)"
-    } else if (config.currentApplicationVersion === 0) {
+    } else if (config.applicationDownloaded === 0) {
       versionLabel.textContent = "Installing...";
     } else {
       versionLabel.textContent = config.currentApplicationVersion;
@@ -80,10 +80,12 @@
           createErrorNotice("Already downloading app");
           return;
         }
+        updateLabel.textContent = formatDate(new Date(Date.now()));
         const download = confirm(`Update ${data.version} is available for download. Install now?`);
         if (download) {
+          versionLabel.textContent = "Installing...";
           ipcRenderer.invoke("downloadApplication").then(() => {
-
+            versionLabel.textContent = data.version;
           });
         }
       });

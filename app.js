@@ -1,7 +1,9 @@
 const electron = require("electron"),
   path = require("path"),
-  fs = require("fs"),
+  fs = require("fs-extra"),
   dmg = require("dmg"),
+  semver = require("semver"),
+  got = require("got"),
   downloadDatabase = require("./assets/util/downloadDatabase.js"),
   {app, BrowserWindow, ipcMain, shell} = electron,
   MAIN_PATH = path.join((electron.app || electron.remote.app).getPath("appData"),"Kahoot Winner"),
@@ -178,13 +180,118 @@ ipcMain.handle("launchApp", () => {
   });
 });
 
+ipcMain.handle("checkAppUpdates", () => {
+  if (config.applicationDownloaded === 0) {
+    return true;
+  }
+  updateMetadata({
+    lastApplicationUpdateCheck: Date.now()
+  });
+  return got("https://raw.githubusercontent.com/theusaf/kahoot-win-launcher/master/metadata.json").json().then((info) => {
+    const current = config.currentApplicationVersion;
+    if (current !== null && (current === info.version || semver.gt(current, info.version))) {
+      return false;
+    }
+    return info;
+  }).catch(() => {
+    return false;
+  });
+});
+
+ipcMain.handle("downloadApplication", () => {
+  if (config.applicationDownloaded === 0) {
+    throw "Already downloading app";
+  }
+  config.applicationDownloaded = 0;
+  return got("https://raw.githubusercontent.com/theusaf/kahoot-win-launcher/master/metadata.json").json().then((info) => {
+    const ext = getExecutableExtension(),
+      {releases, version} = info;
+    let release;
+    switch(ext){
+      case "exe": {
+        release = releases.windows;
+        break;
+      }
+      case "app": {
+        release = releases.mac;
+        break;
+      }
+      case "AppImage": {
+        release = releases.linux;
+        break;
+      }
+    }
+    return new Promise((resolve, reject) => {
+      const temp = "_application." + (ext === "app" ? "dmg" : ext),
+        stream = got.stream(release).pipe(fs.createWriteStream(path.join(MAIN_PATH, temp)));
+      stream.on("error", (err) => {
+        updateMetadata({
+          applicationDownloaded: false
+        });
+        reject(err);
+      });
+      stream.on("finish", () => {
+        if (ext === "app") {
+          dmg.mount(path.join(MAIN_PATH, temp), (err, dir) => {
+            if (err) {
+              updateMetadata({
+                applicationDownloaded: false
+              });
+              return reject(err);
+            }
+            fs.rmdir(path.join(MAIN_PATH, "Kahoot Winner.app"), {recursive: true, force: true}, () => {
+              process.noAsar = true;
+              fs.copy(path.join(dir, "Kahoot Winner.app"), path.join(MAIN_PATH, "Kahoot Winner.app"), (err) => {
+                process.noAsar = false;
+                if (err) {
+                  updateMetadata({
+                    applicationDownloaded: false
+                  });
+                  return reject(err);
+                }
+                fs.unlink(path.join(MAIN_PATH, temp), () => {});
+                dmg.unmount(dir, () => {});
+                updateMetadata({
+                  applicationDownloaded: true,
+                  currentApplicationVersion: version
+                });
+                resolve();
+              });
+            });
+          });
+          return;
+        }
+        fs.rename(path.join(MAIN_PATH, temp), path.join(MAIN_PATH, "Kahoot Winner." + ext), (err) => {
+          if (err) {
+            updateMetadata({
+              applicationDownloaded: false
+            });
+            return reject(err);
+          }
+          updateMetadata({
+            applicationDownloaded: true,
+            currentApplicationVersion: version
+          });
+          resolve();
+        });
+      });
+    });
+  }).catch((e) => {
+    console.log(e)
+    updateMetadata({
+      applicationDownloaded: false
+    });
+    throw "failed to get info";
+  });
+});
+
 ipcMain.handle("updateSettings", (event, settings) => {
   Object.assign(config.settings, settings);
   updateMetadata();
 });
 
 ipcMain.handle("closeWindow", () => {
-  if (options.settings.keepLauncherOpen) {
+  if (config.settings.keepLauncherOpen) {
     return;
   }
   app.quit();
