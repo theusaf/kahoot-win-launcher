@@ -1,5 +1,5 @@
 {
-  "version": "6.0.0",
+  "version": "6.0.1",
   "releases": {
     "windows": "https://github.com/theusaf/kahoot-winner/releases/download/6.0.1/Kahoot.Winner.exe",
     "mac": "https://github.com/theusaf/kahoot-winner/releases/download/6.0.1/Kahoot.Winner.dmg",
