@@ -50,3 +50,43 @@
     <div id="output-appLaunchButton"><span>Check for updates</span></div>
   </div>
 </div>
+<script>
+  (async () => {
+    const update = document.querySelector("#output-appLaunchButton"),
+      versionLabel = document.querySelector("#output-appVersion"),
+      updateLabel = document.querySelector("#output-appUpdate"),
+      config = await ipcRenderer.invoke("getMetadata");
+    if (config.currentApplicationVersion === null) {
+      versionLabel.textContent = "(Not installed)"
+    } else if (config.currentApplicationVersion === 0) {
+      versionLabel.textContent = "Installing...";
+    } else {
+      versionLabel.textContent = config.currentApplicationVersion;
+    }
+    if (config.lastApplicationUpdateCheck) {
+      updateLabel.textContent = formatDate(new Date(config.lastApplicationUpdateCheck));
+    } else {
+      updateLabel.textContent = "Never";
+    }
+    update.addEventListener("click", () => {
+      ipcRenderer.invoke("checkAppUpdates").then((data) => {
+        if (data === false) {
+          updateLabel.textContent = formatDate(new Date(Date.now()));
+          createErrorNotice("No updates found", {
+            notice: true
+          });
+          return;
+        } else if (data === true) {
+          createErrorNotice("Already downloading app");
+          return;
+        }
+        const download = confirm(`Update ${data.version} is available for download. Install now?`);
+        if (download) {
+          ipcRenderer.invoke("downloadApplication").then(() => {
+
+          });
+        }
+      });
+    });
+  })();
+</script>

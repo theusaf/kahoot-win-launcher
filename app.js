@@ -151,7 +151,11 @@ ipcMain.handle("downloadDatabase", async () => {
   if (config.lastDatabaseUpdateTime === false) {
     throw "still downloading";
   }
-  config.lastDatabaseUpdateTime = false;
+  updateMetadata({
+    lastDatabaseUpdateTime: false,
+    databaseDownloaded: false,
+    databaseSize: null
+  });
   await downloadDatabase(MAIN_PATH);
   updateMetadata({
     lastDatabaseUpdateTime: Date.now(),
@@ -198,10 +202,16 @@ fs.mkdir(MAIN_PATH, () => {
         lastDatabaseUpdateTime: null
       });
     }
+    if (config.applicationDownloaded === 0) {
+      updateMetadata({
+        applicationDownloaded: false
+      });
+    }
     fs.stat(path.join(MAIN_PATH, `Kahoot Winner.${getExecutableExtension()}`), (error) => {
       if (error) {
         updateMetadata({
-          applicationDownloaded: false
+          applicationDownloaded: false,
+          currentApplicationVersion: null
         });
       } else {
         updateMetadata({

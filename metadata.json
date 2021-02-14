@@ -1,9 +1,9 @@
 {
-  "version": "6.0.0",
+  "version": "6.0.0-pre1",
   "releases": {
-    "windows": null,
-    "mac": null,
-    "linux": null
+    "windows": "https://github.com/theusaf/kahoot-winner/releases/download/6.0.0-pre1/Kahoot.Winner.exe",
+    "mac": "https://github.com/theusaf/kahoot-winner/releases/download/6.0.0-pre1/Kahoot.Winner.dmg",
+    "linux": "https://github.com/theusaf/kahoot-winner/releases/download/6.0.0-pre1/Kahoot.Winner.AppImage"
   },
   "database_format": 0,
   "launcher_version": "1.0.0",

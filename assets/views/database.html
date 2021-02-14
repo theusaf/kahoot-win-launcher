@@ -53,6 +53,7 @@
       del = document.querySelector("#output-delete"),
       size = document.querySelector("#output-size");
     download.addEventListener("click", () => {
+      loaded.textContent = " not ";
       ipcRenderer.invoke("downloadDatabase").then(() => {
         loaded.textContent = " ";
         updated.textContent = formatDate(new Date(Date.now()));
