@@ -1,9 +1,9 @@
 {
   "version": "6.0.0",
   "releases": {
-    "windows": "https://github.com/theusaf/kahoot-winner/releases/download/6.0.0/Kahoot.Winner.exe",
-    "mac": "https://github.com/theusaf/kahoot-winner/releases/download/6.0.0/Kahoot.Winner.dmg",
-    "linux": "https://github.com/theusaf/kahoot-winner/releases/download/6.0.0/Kahoot.Winner.AppImage"
+    "windows": "https://github.com/theusaf/kahoot-winner/releases/download/6.0.0-fix1/Kahoot.Winner.exe",
+    "mac": "https://github.com/theusaf/kahoot-winner/releases/download/6.0.0-fix1/Kahoot.Winner.dmg",
+    "linux": "https://github.com/theusaf/kahoot-winner/releases/download/6.0.0-fix1/Kahoot.Winner.AppImage"
   },
   "database_format": 0,
   "launcher_version": "1.0.0",
