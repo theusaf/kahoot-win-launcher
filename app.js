@@ -2,10 +2,12 @@ const electron = require("electron"),
   path = require("path"),
   fs = require("fs"),
   dmg = require("dmg"),
+  downloadDatabase = require("./assets/util/downloadDatabase.js"),
   {app, BrowserWindow, ipcMain, shell} = electron,
   MAIN_PATH = path.join((electron.app || electron.remote.app).getPath("appData"),"Kahoot Winner"),
   config = {
     databaseDownloaded: false,
+    databaseSize: null,
     applicationDownloaded: false,
     currentApplicationVersion: null,
     lastApplicationUpdateCheck: null,
@@ -34,6 +36,45 @@ function getExecutableExtension(){
       return "AppImage";
     }
   }
+}
+
+function getSize(file){
+  return getStat(file).then((stat) => {
+    if (stat.isFile()) {
+      return stat.size;
+    } else {
+      return getFiles(file).then((files) => {
+        const promises = files.map((f) => {
+          return path.join(file, f);
+        }).map(getSize);
+        return Promise.all(promises);
+      }).then((elementSizes) => {
+        let total = 0;
+        elementSizes.forEach((size) => {
+          total += size;
+        });
+        return total;
+      });
+    }
+  });
+}
+
+function getStat(file){
+  return new Promise((resolve, reject) => {
+    fs.stat(file, (err, stat) => {
+      if (err) {return reject(err);}
+      resolve(stat);
+    });
+  });
+}
+
+function getFiles(file){
+  return new Promise((resolve, reject) => {
+    fs.readdir(file, (err, stat) => {
+      if (err) {return reject(err);}
+      resolve(stat);
+    });
+  });
 }
 
 function createWindow() {
@@ -79,6 +120,47 @@ ipcMain.handle("getMetadata", () => {
   return config;
 });
 
+ipcMain.handle("getDatabaseSize", async () => {
+  const size = config.databaseSize || await getSize(path.join(MAIN_PATH, "json-full"));
+  if (size !== config.databaseSize) {
+    updateMetadata({
+      databaseSize: size
+    });
+  }
+  return size;
+});
+
+ipcMain.handle("deleteDatabase", () => {
+  return new Promise((resolve) => {
+    updateMetadata({
+      databaseDownloaded: false
+    });
+    fs.unlink(path.join(MAIN_PATH, "keys.json"), () => {
+      fs.rmdir(path.join(MAIN_PATH, "json-full"), {recursive: true, force: true}, () => {
+        updateMetadata({
+          databaseSize: null,
+          databaseDownloaded: false
+        });
+        resolve();
+      });
+    });
+  });
+});
+
+ipcMain.handle("downloadDatabase", async () => {
+  if (config.lastDatabaseUpdateTime === false) {
+    throw "still downloading";
+  }
+  config.lastDatabaseUpdateTime = false;
+  await downloadDatabase(MAIN_PATH);
+  updateMetadata({
+    lastDatabaseUpdateTime: Date.now(),
+    databaseDownloaded: true,
+    databaseSize: null
+  });
+  return;
+});
+
 ipcMain.handle("launchApp", () => {
   return new Promise((resolve) => {
     fs.writeFile(path.join(MAIN_PATH, ".env"), `PORT=${config.settings.PORT || 2000}`, () => {
@@ -111,10 +193,19 @@ fs.mkdir(MAIN_PATH, () => {
       return updateMetadata();
     }
     Object.assign(config, JSON.parse(data));
+    if (config.lastDatabaseUpdateTime === false) {
+      updateMetadata({
+        lastDatabaseUpdateTime: null
+      });
+    }
     fs.stat(path.join(MAIN_PATH, `Kahoot Winner.${getExecutableExtension()}`), (error) => {
       if (error) {
         updateMetadata({
           applicationDownloaded: false
+        });
+      } else {
+        updateMetadata({
+          applicationDownloaded: true
         });
       }
     });

@@ -4,6 +4,9 @@ const {ipcRenderer} = require("electron"),
   errorContainer = document.querySelector("#errors"),
   launchButton = document.querySelector("#launch-button");
 
+let launchFails = 0,
+  launchTimeout;
+
 function createErrorNotice(error, options){
   const div = document.createElement("div");
   div.innerHTML = `
@@ -48,12 +51,31 @@ async function loadView(view){
 async function launchApp(){
   const launchedSuccessfully = await ipcRenderer.invoke("launchApp");
   if (!launchedSuccessfully) {
-    createErrorNotice("Application was not launched. Install the application first.", {
+    const messages = [
+      "There is no application to launch. Please install the app first.",
+      "There is still no application to launch.",
+      "You gotta stop trying this, man.",
+      "THERE. IS. NO. APP.",
+      "Hgnk!! FFrrggghhhH!1",
+      "Never gonna give you up, never gonna let you down, neve gonna run around and desert you"
+    ];
+    clearTimeout(launchTimeout);
+    createErrorNotice(messages[launchFails++] || messages[messages.length - 1], {
       time: 10e3
     });
+    launchTimeout = setTimeout(() => {
+      launchFails = 0;
+    }, 2e3);
   } else {
     ipcRenderer.invoke("closeWindow");
   }
+}
+
+function formatDate(date){
+  const year = date.getFullYear(),
+    month = date.getMonth() + 1,
+    day = date.getDate();
+  return `${day}/${month}/${year}`;
 }
 
 window.addEventListener("load", () => {

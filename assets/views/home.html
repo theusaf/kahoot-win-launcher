@@ -64,7 +64,7 @@
     });
     ipcRenderer.invoke("getMetadata").then((data) => {
       version.textContent = data.currentApplicationVersion || "(Not installed)";
-      updateCheck.textContent = data.lastApplicationUpdateCheck ? new Date(data.lastApplicationUpdateCheck) : "Never";
+      updateCheck.textContent = data.lastApplicationUpdateCheck ? formatDate(new Date(data.lastApplicationUpdateCheck)) : "Never";
     });
   })();
 </script>

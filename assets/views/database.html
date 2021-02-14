@@ -1,4 +1,77 @@
+<style>
+  #output-container{
+    display: flex;
+  }
+  #output-actions{
+    flex: 1;
+    display: flex;
+    align-items: center;
+    position: relative;
+  }
+  #output-actions > div{
+    right: 0.5rem;
+    position: absolute;
+  }
+  #output-actions span{
+    text-align: center;
+    cursor: pointer;
+    font-weight: 600;
+    display: block;
+    color: black;
+    margin-bottom: 0.5rem;
+    background: rgb(102,191,57);
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+    box-shadow: 0.25rem 0.25rem rgba(0,0,0,0.5);
+  }
+  #output-actions span:hover{
+    box-shadow: unset;
+    transform: translate(.25rem, .25rem);
+    background: white;
+  }
+</style>
 <h2>Database</h2>
-<div>
-  
+<div id="output-container">
+  <div>
+    <p>Database<span id="output-loaded"> not </span>loaded.</p>
+    <p>Last updated: <span id="output-updated">Never</span></p>
+    <p>Database size: <span id="output-size">0B</span></p>
+  </div>
+  <div id="output-actions">
+    <div>
+      <span id="output-download">Download Database</span>
+      <span id="output-delete">Delete Database</span>
+    </div>
+  </div>
 </div>
+<script>
+  (async () => {
+    const data = await ipcRenderer.invoke("getMetadata"),
+      loaded = document.querySelector("#output-loaded"),
+      updated = document.querySelector("#output-updated"),
+      download = document.querySelector("#output-download"),
+      del = document.querySelector("#output-delete"),
+      size = document.querySelector("#output-size");
+    download.addEventListener("click", () => {
+      ipcRenderer.invoke("downloadDatabase").then(() => {
+        loaded.textContent = " ";
+        updated.textContent = formatDate(new Date(Date.now()));
+      });
+      updated.textContent = "Downloading...";
+    });
+    del.addEventListener("click", () => {
+      ipcRenderer.invoke("deleteDatabase");
+      loaded.textContent = " not ";
+    });
+    if (data.databaseDownloaded) {
+      loaded.textContent = " ";
+    }
+    if (data.lastDatabaseUpdateTime === false) {
+      updated.textContent = "Downloading...";
+    } else if (data.lastDatabaseUpdateTime) {
+      updated.textContent = formatDate(new Date(data.lastDatabaseUpdateTime));
+      size.textContent = "Calculating size...";
+      size.textContent = (+(await ipcRenderer.invoke("getDatabaseSize")) / 1e9).toFixed(2) + "GB";
+    }
+  })();
+</script>
